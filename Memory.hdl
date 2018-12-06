@@ -1,4 +1,4 @@
-// This file is part of www.nand2tetris.org
+ // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/05/Memory.hdl
@@ -28,12 +28,18 @@ CHIP Memory {
 
     PARTS:
     // Put your code here:
-	DMux4Way(in=load,sel=address[13..14],a=ram,b=ram2,c=screen,d=keyboard);
+	DMux4Way(in=load,sel=address[13..14],a=ram,b=ram2,c=screen,d=keyboard); 
+	//load is the input, selector bits are drawn from the specified address, outputs, 2 different rams, as well as screen and keyboard
 	Or(a=ram,b=ram2,out=ram3);
+	//or the 2 outputted rams together so they can act as one load bit in the next step
 	RAM16K(in=in,load=ram3,address=address[0..13],out=ramout);
+	//input is arbitrarily chosen, ram3 from previous step acts as load bit to choose which one of the specified addresses the ramoout will go to
 	Screen(in=in,load=screen,address=address[0..12],out=screenout);
+	//screen operation was given, put output into specified address 
 	Keyboard(out=k);
+	//all outputs to the keyboard are labeled variable "k"
 	Mux4Way16(a=ramout,b=ramout,c=screenout,d=k,sel=address[13..14],out=out);
+	//4 inputs: ramout inputs twice, screenoutput inputs once, keyboard output inputs once, put output in specified address and save is as memory
 
 
 }
