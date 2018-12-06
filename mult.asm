@@ -7,38 +7,38 @@
 // (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
 
 // Put your code here.
-@2
-M=0
+@2 //location of final answer
+M=0 //make sure it is cleared 
 
-@0
+@0 
 D=M
 @END
-D;JEQ
+D;JEQ //jump if one product equals zero
 
 @1
 D=M
 @END
-D;JEQ
+D;JEQ //jump if one product equals zero
 
 @0
 D=M
 @3
-M=D
+M=D //only keep the numbers being multiplied, store in RAM3
 
 (LOOP)
-@1
-D=M
+@1 //look at the second number
+D=M //allow d to hold it 
 
 @2
-M=D+M
+M=D+M //second number is now stored at RAM2 as final answer
 
-@3
-M=M-1
+@3 //look at the first number
+M=M-1 //subtract 1 away from the first number
 
-D=M-1@LOOP
-D;JGT
-M;JGT
+D=M-1 
+@LOOP
+M;JGT //repeat the multiplication and subtraction forever until
 
 (END)
 @END
-0;JMP
+0;JMP //jump to end program when equal to 0
