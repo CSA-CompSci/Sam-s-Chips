@@ -40,16 +40,26 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
-	And(a=instruction[15], b=instruction[4], out=loadD);
-    And(a=instruction[15], b=jump, out=loadPC);
-    And(a=instruction[15], b=instruction[3], out=writeM);
-	Mux16(a=aluOutput, b=instruction, sel=aInstruction, out=aInput);
-	ARegister(in=aInput, load=loadA, out=aRegister, out[0..14]=addressM);
-    DRegister(in=aluOutput, load=loadD, out=dRegister);
-	Mux16(a=aRegister, b=inM, sel=instruction[12], out=aluInput);
-	ALU(x=dRegister,y=aluInput,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=aluout,out=outM,zr=zero,ng=neg);
-    JLEQ(zero=zero, neg=neg, code=instruction[0..2], out=jump);
-	PC(in=aRegister, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
+// Distiguishes the A register as an instruction (a) or as a specified address (b)
+Or(a=aInstruction, b=instruction[5], out=loadA);
+// If an A instruction is being used send no data to the other addresses
+And(a=instruction[15], b=instruction[4], out=loadD);
+And(a=instruction[15], b=jump, out=loadPC);
+And(a=instruction[15], b=instruction[3], out=writeM);
+// Takes the instructions and puts them into one variable that will input into the A register, selector bit determines wether to keep the new instruction or repeat the output of the ALU
+Mux16(a=aluOutput, b=instruction, sel=aInstruction, out=aInput);
+// Sends A register commands to specified memory addresses
+ARegister(in=aInput, load=loadA, out=aRegister, out[0..14]=addressM);
+// Sends D register commands to the specified memory addresses
+DRegister(in=aluOutput, load=loadD, out=dRegister);
+// Takes two inputs and makes them into one to be used as the input for the alu, the selector bit at [12] is determining which one goes
+Mux16(a=aRegister, b=inM, sel=instruction[12], out=aluInput);
+// Alu result is determined by the number being held at each instruction, 1 means you do it 0 means you don't
+ALU(x=dRegister,y=aluInput,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=aluout,out=outM,zr=zero,ng=neg);
+// Program will jump if less than or equal to zero after negating the values at the specified adresses
+JLE(zero=zero, neg=neg, code=instruction[0..2], out=jump
+// Program counter will start or reset and obtain new A register value
+PC(in=aRegister, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
 
 
 
